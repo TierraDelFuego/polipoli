@@ -768,8 +768,12 @@ httpParseHeaders(int client, AtomPtr url,
         name_start, name_end, value_start, value_end, 
         token_start, token_end, end;
     AtomPtr name = NULL;
-    time_t date = -1, last_modified = -1, expires = -1, polipo_age = -1,
-        polipo_access = -1, polipo_body_offset = -1;
+    time_t date = current_time.tv_sec;
+    time_t last_modified = -1;
+    time_t expires = -1;
+    time_t polipo_age = -1;
+    time_t polipo_access = current_time.tv_sec;
+    time_t polipo_body_offset = -1;
     int len = -1;
     CacheControlRec cache_control;
     char *endptr;
@@ -988,7 +992,8 @@ httpParseHeaders(int client, AtomPtr url,
             else if(name == atomXPolipoDate)
                 polipo_age = t;
             else if(name == atomXPolipoAccess)
-                polipo_access = t;
+		  if(t >= 0)
+		       polipo_access = t;
         } else if(name == atomAge) {
             j = skipWhitespace(buf, value_start);
             if(j < 0) {

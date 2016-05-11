@@ -134,6 +134,7 @@ parse_time(const char *buf, int offset, int len, time_t *time_return)
     struct tm tm;
     time_t t;
     int i = offset;
+    int saved_i = offset;
 
     i = skip_word(buf, i, len); if(i < 0) return -1;
     i = skip_separator(buf, i, len); if(i < 0) return -1;
@@ -161,7 +162,15 @@ parse_time(const char *buf, int offset, int len, time_t *time_return)
         i = skip_separator(buf, i, len); if(i < 0) return -1;
         i = parse_int(buf, i, len, &tm.tm_sec); if(i < 0) return -1;
         i = skip_separator(buf, i, len); if(i < 0) return -1;
-        i = skip_word(buf, i, len); if(i < 0) return -1;
+        /* i = skip_word(buf, i, len); if(i < 0) return -1; */
+        saved_i = i;
+        i = skip_word(buf, i, len);
+        if(i < 0) {
+            i = saved_i;
+            if(buf[i] != '+' && buf[i] != '-') return -1;
+            i++;
+            i = parse_int(buf, i, len, &saved_i); if(i < 0) return -1;
+        }
     } else {                    /* funny American format */
         i = parse_month(buf, i, len, &tm.tm_mon); if(i < 0) return -1;
         i = skip_separator(buf, i, len); if(i < 0) return -1;
@@ -173,7 +182,15 @@ parse_time(const char *buf, int offset, int len, time_t *time_return)
         i = skip_separator(buf, i, len); if(i < 0) return -1;
         i = parse_int(buf, i, len, &tm.tm_sec); if(i < 0) return -1;
         i = skip_separator(buf, i, len); if(i < 0) return -1;
-        i = parse_int(buf, i, len, &tm.tm_year); if(i < 0) return -1;
+        /* i = parse_int(buf, i, len, &tm.tm_year); if(i < 0) return -1; */
+        saved_i = i;
+        i = parse_int(buf, i, len, &tm.tm_year);
+        if(i < 0) {
+            i = saved_i;
+            i = skip_word(buf, i, len); if(i < 0) return -1;
+            i = skip_separator(buf, i, len); if(i < 0) return -1;
+            i = parse_int(buf, i, len, &tm.tm_year); if(i < 0) return -1;
+        }
         if(tm.tm_year < 100)
             tm.tm_year += 1900;
         if(tm.tm_year < 1937)

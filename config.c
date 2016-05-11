@@ -852,7 +852,7 @@ int
 configFloatSetter(ConfigVariablePtr var, void* value)
 {
     assert(var->type == CONFIG_FLOAT);
-    *var->value.i = *(float*)value;
+    *var->value.f = *(float*)value;
     return 1;
 }
 

@@ -985,10 +985,10 @@ objectIsStale(ObjectPtr object, CacheControlPtr cache_control)
         if(object->last_modified >= 0)
             /* Again, take care of clock skew */
             stale = MIN(stale,
-                        object->age +
-                        (date - object->last_modified) * maxAgeFraction);
+                        (int) (object->age +
+                        (date - object->last_modified) * maxAgeFraction) );
         else
-            stale = MIN(stale, object->age + maxNoModifiedAge);
+            stale = MIN(stale, (int) (object->age + maxNoModifiedAge));
     }
 
     if(!(flags & CACHE_MUST_REVALIDATE) &&

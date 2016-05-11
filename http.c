@@ -591,19 +591,6 @@ httpMakeConnection()
 }
 
 void
-httpDestroyConnection(HTTPConnectionPtr connection)
-{
-    assert(connection->flags == 0);
-    httpConnectionDestroyBuf(connection);
-    assert(!connection->request);
-    assert(!connection->request_last);
-    httpConnectionDestroyReqbuf(connection);
-    assert(!connection->timeout);
-    assert(!connection->server);
-    free(connection);
-}
-
-void
 httpConnectionDestroyBuf(HTTPConnectionPtr connection)
 {
     if(connection->buf) {

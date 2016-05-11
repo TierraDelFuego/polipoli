@@ -71,10 +71,12 @@ snnprint_n(char *restrict buf, int n, int len, const char *s, int slen)
     if(n < 0) return -2;
     while(i < slen && n < len)
         buf[n++] = s[i++];
-    if(n < len)
+    if(n < len) {
+	buf[n] = 0;
         return n;
-    else
+    } else {
         return -1;
+    }
 }
 
 int

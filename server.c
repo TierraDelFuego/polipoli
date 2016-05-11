@@ -640,7 +640,7 @@ httpServerConnectionHandlerCommon(int status, HTTPConnectionPtr connection)
         return 1;
     }
 
-    do_log(D_SERVER_CONN, "C    %s:%d.\n",
+    do_log(D_SERVER_CONN, "Server Conn    %s:%d.\n",
            scrub(connection->server->name), connection->server->port);
 
     connection->connecting = 0;
@@ -1207,7 +1207,7 @@ httpServerFinish(HTTPConnectionPtr connection, int s, int offset)
                request->time0.tv_sec != null_time.tv_sec)
                 rtt = timeval_minus_usec(&request->time1, &request->time0);
             if(size >= 8192 && d > 50000)
-                rate = ((double)size / (double)d) * 1000000.0 + 0.5;
+                rate = (int) (((double)size / (double)d) * 1000000.0 + 0.5);
         }
         request->time0 = null_time;
         request->time1 = null_time;

@@ -1,9 +1,9 @@
-PREFIX = /usr/local
+PREFIX = /p/polipo
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/man
 INFODIR = $(PREFIX)/info
-LOCAL_ROOT = /usr/share/polipo/www
-DISK_CACHE_ROOT = /var/cache/polipo
+LOCAL_ROOT = /p/polipo/www
+DISK_CACHE_ROOT = /p/polipo/cache
 
 # To compile with Unix CC:
 
@@ -12,7 +12,8 @@ DISK_CACHE_ROOT = /var/cache/polipo
 # To compile with GCC:
 
 # CC = gcc
-CDEBUGFLAGS = -Os -g -Wall -fno-strict-aliasing
+CC = musl-gcc
+CDEBUGFLAGS = -Os -Wall -fno-strict-aliasing
 
 # To compile on a pure POSIX system:
 
@@ -58,7 +59,11 @@ FILE_DEFINES = -DLOCAL_ROOT=\"$(LOCAL_ROOT)/\" \
 #  -DNO_REDIRECTOR to compile out the Squid-style redirector code
 #  -DNO_SYSLOG to compile out logging to syslog
 
+PLATFORM_DEFINES = -DNO_IPv6 -DNO_SOCKS
+
 DEFINES = $(FILE_DEFINES) $(PLATFORM_DEFINES)
+
+EXTRA_DEFINES = -static
 
 CFLAGS = $(MD5INCLUDES) $(CDEBUGFLAGS) $(DEFINES) $(EXTRA_DEFINES)
 
@@ -70,7 +75,9 @@ SRCS = util.c event.c io.c chunk.c atom.c object.c log.c diskcache.c main.c \
 OBJS = util.o event.o io.o chunk.o atom.o object.o log.o diskcache.o main.o \
        config.o local.o http.o client.o server.o auth.o tunnel.o \
        http_parse.o parse_time.o dns.o forbidden.o \
-       md5import.o ftsimport.o socks.o mingw.o
+       md5import.o ftsimport.o socks.o
+
+# mingw.o
 
 polipo$(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o polipo$(EXE) $(OBJS) $(MD5LIBS) $(LDLIBS)

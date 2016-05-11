@@ -854,14 +854,18 @@ validateEntry(ObjectPtr object, int fd,
     int dummy;
     int code;
     AtomPtr headers;
-    time_t date, last_modified, expires, polipo_age, polipo_access;
+    time_t date = current_time.tv_sec;
+    time_t last_modified = -1;
+    time_t expires = -1;
+    time_t polipo_age = -1;
+    time_t polipo_access = current_time.tv_sec;
     int length;
     off_t offset = -1;
     int body_offset;
-    char *etag;
+    char *etag = NULL;
     AtomPtr via;
     CacheControlRec cache_control;
-    char *location;
+    char *location = NULL;
     AtomPtr message;
     int dirty = 0;
 
@@ -1008,8 +1012,10 @@ validateEntry(ObjectPtr object, int fd,
         }
     }
 
-    if(location)
+    if(location) {
         free(location);
+	location = NULL;
+    }
 
     if(headers) {
         if(!object->headers)
@@ -1048,11 +1054,13 @@ validateEntry(ObjectPtr object, int fd,
     if(object->age < 0) object->age = object->date;
     if(object->age < 0) object->age = 0; /* a long time ago */
     if(object->length < 0) object->length = length;
-    if(!object->etag)
+    if(!object->etag) {
         object->etag = etag;
-    else {
-        if(etag)
+    } else {
+        if(etag) {
             free(etag);
+	    etag = NULL;
+	}
     }
     releaseAtom(message);
 
@@ -1082,8 +1090,14 @@ validateEntry(ObjectPtr object, int fd,
 
  invalid:
     releaseAtom(message);
-    if(etag) free(etag);
-    if(location) free(location);
+    if(etag) {
+	 free(etag);
+	 etag = NULL;
+    }
+    if(location) {
+	 free(location);
+	 location = NULL;
+    }
     if(via) releaseAtom(via);
     /* fall through */
 
@@ -1790,6 +1804,7 @@ mergeDobjects(DiskObjectPtr dst, DiskObjectPtr src)
     if(dst->last_modified < 0)
         dst->last_modified = src->last_modified;
     free(src);
+    src = NULL;
 }
 
 DiskObjectPtr

@@ -314,8 +314,8 @@ initForbidden(void)
     }
 
     if(forbiddenFile == NULL) {
-        if(access("/etc/polipo/forbidden", F_OK) >= 0)
-            forbiddenFile = internAtom("/etc/polipo/forbidden");
+        if(access("/p/polipo/forbidden", F_OK) >= 0)
+            forbiddenFile = internAtom("/p/polipo/forbidden");
     }
 
     parseDomainFile(forbiddenFile, &forbiddenDomains, &forbiddenRegex);
@@ -335,8 +335,8 @@ initForbidden(void)
     }
 
     if(uncachableFile == NULL) {
-        if(access("/etc/polipo/uncachable", F_OK) >= 0)
-            uncachableFile = internAtom("/etc/polipo/uncachable");
+        if(access("/p/polipo/uncachable", F_OK) >= 0)
+            uncachableFile = internAtom("/p/polipo/uncachable");
     }
 
     parseDomainFile(uncachableFile, &uncachableDomains, &uncachableRegex);
@@ -355,8 +355,8 @@ initForbidden(void)
     }
     
     if(forbiddenTunnelsFile == NULL) {
-        if(access("/etc/polipo/forbiddenTunnels", F_OK) >= 0)
-            forbiddenTunnelsFile = internAtom("/etc/polipo/forbiddenTunnels");
+        if(access("/p/polipo/forbiddenTunnels", F_OK) >= 0)
+            forbiddenTunnelsFile = internAtom("/p/polipo/forbiddenTunnels");
     }
     
     parseDomainFile(forbiddenTunnelsFile, &forbiddenTunnelsDomains, &forbiddenTunnelsRegex);
@@ -436,21 +436,21 @@ urlForbidden(AtomPtr url,
              int (*handler)(int, AtomPtr, AtomPtr, AtomPtr, void*),
              void *closure)
 {
-    int forbidden = urlIsMatched(url->string, url->length,
+	int forbidden = urlIsMatched(url->string, url->length,
                                  forbiddenDomains, forbiddenRegex);
-    int code = 0;
-    AtomPtr message = NULL, headers = NULL;
+    	int code = 0;
+    	AtomPtr message = NULL, headers = NULL;
 
-
-    if(forbidden) {
-        message = internAtomF("Forbidden URL %s", url->string);
-        if(forbiddenUrl) {
-            code = forbiddenRedirectCode;
-            headers = internAtomF("\r\nLocation: %s", forbiddenUrl->string);
-        } else {
-            code = 403;
-        }
-    }
+	if(forbidden) {
+	  	message = internAtomF("Forbidden URL %s", url->string);
+		do_log(L_ERROR, "Forbidden URL %s\n", url->string);
+        	if(forbiddenUrl) {
+            		code = forbiddenRedirectCode;
+            		headers = internAtomF("\r\nLocation: %s", forbiddenUrl->string);
+        	} else {
+            		code = 403;
+		}
+	}
 
 #ifndef NO_REDIRECTOR
     if(code == 0 && redirector) {
